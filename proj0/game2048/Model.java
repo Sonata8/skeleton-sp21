@@ -165,6 +165,10 @@ public class Model extends Observable {
         return false;
     }
 
+    public static boolean isInBoard(int col, int row, int size) {
+        return col > 0 && col < size && row > 0 && row < size;
+    }
+
     /**
      * Returns true if there are any valid moves on the board.
      * There are two ways that there can be valid moves:
@@ -172,7 +176,32 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+
+        /** Case1: having at least 1 empty tile */
+        for (int col = 0; col < size; col += 1) {
+            for (int row = 0; row < size; row += 1) {
+                if (b.tile(col, row) == null) {
+                    return true;
+                }
+            }
+        }
+
+        /** Case 2: having at least 2 adjacent tiles that can be merged */
+        for (int col = 0; col < size; col += 1) {
+            for (int row = 0; row < size; row += 1) {
+                for (int dx = -1; dx <= 1; dx += 1) {
+                    for (int dy = -1; dy <= 1; dy += 1) {
+                        if (dx == 0 && dy == 0) continue;
+                        int x = col + dx, y = row + dy;
+                        if (isInBoard(x, y, size) && b.tile(x, y).value() == b.tile(col, row).value()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
