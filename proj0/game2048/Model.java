@@ -93,7 +93,7 @@ public class Model extends Observable {
         checkGameOver();
         setChanged();
     }
-
+    
     /** Tilt the board toward SIDE. Return true iff this changes the board.
      *
      * 1. If two Tile objects are adjacent in the direction of motion and have
@@ -116,6 +116,61 @@ public class Model extends Observable {
 
         board.setViewingPerspective(side);
 
+        int size = board.size();
+
+        for (int col = 0; col < size; col += 1) {
+            int now = -1;
+            boolean[] merged = new boolean[size];
+            for (int row = size - 1; row >= 0; row -= 1) {
+                Tile t = board.tile(col, row);
+                if (t == null) {
+                    continue;
+                }
+
+                // below condition : t is not null
+
+                // above are all null
+                if (now == -1) {
+                    if (row == size - 1) {
+                        now = size - 1;
+                        continue;
+                    }
+                    changed = true;
+                    board.move(col, size - 1, t);
+                    now = size - 1;
+                    continue;
+                }
+
+                // above we have at least one tile
+                if (merged[now]) {
+                    if (row == now - 1) {
+                        now -= 1;
+                        continue;
+                    }
+                    changed = true;
+                    board.move(col, now - 1, t);
+                    now -= 1;
+                    continue;
+                } else {
+                    if (t.value() != board.tile(col, now).value()) {
+                        if (row == now - 1) {
+                            now -= 1;
+                            continue;
+                        }
+                        changed = true;
+                        board.move(col, now - 1, t);
+                        now -= 1;
+                        continue;
+                    } else {
+                        changed = true;
+                        board.move(col, now, t);
+                        merged[now] = true;
+                        score += board.tile(col, now).value();
+                    }
+                }
+
+            }
+        }
 
         board.setViewingPerspective(Side.NORTH);
         checkGameOver();
