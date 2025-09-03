@@ -114,6 +114,10 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
+        board.setViewingPerspective(side);
+
+
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
@@ -157,6 +161,7 @@ public class Model extends Observable {
         int size = b.size();
         for (int col = 0; col < size; col += 1) {
             for (int row = 0; row < size; row += 1) {
+                if (b.tile(col, row) == null) continue;
                 if (b.tile(col, row).value() == MAX_PIECE) {
                     return true;
                 }
@@ -187,16 +192,16 @@ public class Model extends Observable {
             }
         }
 
+        int[] dx = new int[]{0, 0, 1, -1};
+        int[] dy = new int[]{1, -1, 0, 0};
+
         /** Case 2: having at least 2 adjacent tiles that can be merged */
         for (int col = 0; col < size; col += 1) {
             for (int row = 0; row < size; row += 1) {
-                for (int dx = -1; dx <= 1; dx += 1) {
-                    for (int dy = -1; dy <= 1; dy += 1) {
-                        if (dx == 0 && dy == 0) continue;
-                        int x = col + dx, y = row + dy;
-                        if (isInBoard(x, y, size) && b.tile(x, y).value() == b.tile(col, row).value()) {
-                            return true;
-                        }
+                for (int i = 0; i < 4; i += 1) {
+                    int x = col + dx[i], y = row + dy[i];
+                    if (isInBoard(x, y, size) && b.tile(x, y).value() == b.tile(col, row).value()) {
+                        return true;
                     }
                 }
             }
